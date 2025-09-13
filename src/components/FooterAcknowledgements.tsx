@@ -6,7 +6,7 @@ export default function FooterAcknowledgements() {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="fixed bottom-4 right-4 z-40">
+    <div className="fixed bottom-4 right-4 z-30">
       {isExpanded ? (
         <div className="bg-blueprint-dark/95 border border-blueprint-cyan p-3 max-w-sm">
           <button

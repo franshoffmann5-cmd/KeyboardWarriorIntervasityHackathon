@@ -143,7 +143,7 @@ export default function LessonsPanel({ isOpen, onToggle, onXpGain, isSignedIn }:
 
       {/* Panel */}
       <div
-        className={`fixed right-0 top-0 h-full w-72 sm:w-96 bg-blueprint-dark border-l-2 border-blueprint-cyan transform transition-all duration-500 ease-out z-50 ${
+        className={`fixed right-0 top-0 h-full w-72 sm:w-96 bg-blueprint-dark border-l-2 border-blueprint-cyan transform transition-all duration-500 ease-out z-40 ${
           !isSignedIn
             ? "translate-x-full opacity-0 pointer-events-none"
             : isOpen 

@@ -164,6 +164,7 @@ export default function Fortify() {
               level={level}
               maxXp={level < 4 ? levelThresholds[level] : 1000}
               minXp={level > 1 ? levelThresholds[level - 1] : 0}
+              onClick={() => addXp(100)}
             />
           </div>
 
@@ -180,6 +181,15 @@ export default function Fortify() {
           onXpGain={addXp} 
           isSignedIn={isSignedIn}
         />
+
+        {/* Audio Controls - moved inside main layout for proper z-index layering */}
+        <VolumeControl
+          volume={audio.volume}
+          muted={audio.muted}
+          onChange={audio.setVolume}
+          onToggleMute={audio.toggleMute}
+        />
+        <FooterAcknowledgements />
       </div>
 
       {/* Level Up Overlay */}
@@ -213,14 +223,6 @@ export default function Fortify() {
         />
       )}
 
-      {/* Volume Control */}
-      <VolumeControl
-        volume={audio.volume}
-        muted={audio.muted}
-        onChange={audio.setVolume}
-        onToggleMute={audio.toggleMute}
-      />
-
       {/* Enable Music Button (shows if autoplay failed) */}
       {showMusicEnable && (
         <button
@@ -237,16 +239,6 @@ export default function Fortify() {
           🎵 ENABLE MUSIC
         </button>
       )}
-
-      {/* Footer Acknowledgements */}
-      <FooterAcknowledgements />
-
-      <button
-        onClick={() => addXp(100)}
-        className="fixed bottom-2 right-2 sm:bottom-4 sm:right-4 lg:bottom-6 lg:right-6 bg-blueprint-cyan text-blueprint-dark px-3 py-2 sm:px-4 sm:py-3 lg:px-6 lg:py-4 font-pixel text-sm md:text-base lg:text-lg xl:text-xl hover:bg-white transition-colors z-40"
-      >
-        +100 XP
-      </button>
     </div>
   )
 }

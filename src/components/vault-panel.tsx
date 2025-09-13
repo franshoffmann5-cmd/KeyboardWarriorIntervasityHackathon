@@ -197,7 +197,7 @@ export default function VaultPanel({ isOpen, onToggle, entries, setEntries, onXp
 
       {/* Panel */}
       <div
-        className={`fixed left-0 top-0 h-full w-64 sm:w-80 bg-blueprint-dark border-r-2 border-blueprint-cyan transform transition-all duration-500 ease-out z-10 ${
+        className={`fixed left-0 top-0 h-full w-64 sm:w-80 bg-blueprint-dark border-r-2 border-blueprint-cyan transform transition-all duration-500 ease-out z-40 ${
           !isSignedIn
             ? "-translate-x-full opacity-0 pointer-events-none"
             : isOpen 

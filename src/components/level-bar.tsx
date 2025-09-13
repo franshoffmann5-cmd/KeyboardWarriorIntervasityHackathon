@@ -3,13 +3,18 @@ interface LevelBarProps {
   level: number
   maxXp: number
   minXp: number
+  onClick?: () => void
 }
 
-export default function LevelBar({ xp, level, maxXp, minXp }: LevelBarProps) {
+export default function LevelBar({ xp, level, maxXp, minXp, onClick }: LevelBarProps) {
   const progress = ((xp - minXp) / (maxXp - minXp)) * 100
 
   return (
-    <div className="w-full">
+    <div 
+      className={`w-full ${onClick ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''}`}
+      onClick={onClick}
+      title={onClick ? "Click to gain 100 XP" : undefined}
+    >
       {/* Level Display */}
       <div className="flex justify-between items-center mb-2">
         <span className="text-blueprint-cyan text-sm md:text-base lg:text-lg xl:text-xl font-pixel">LEVEL {level}</span>

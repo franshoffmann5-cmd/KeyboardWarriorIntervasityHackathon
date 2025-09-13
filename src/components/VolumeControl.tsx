@@ -32,7 +32,7 @@ export default function VolumeControl({ volume, muted, onChange, onToggleMute }:
 
   return (
     <div 
-      className="fixed bottom-4 left-4 z-50 flex items-center gap-2 bg-blueprint-dark/90 border border-blueprint-cyan p-2 transition-all duration-200"
+      className="fixed bottom-4 left-4 z-30 flex items-center gap-2 bg-blueprint-dark/90 border border-blueprint-cyan p-2 transition-all duration-200"
       onMouseEnter={() => setIsExpanded(true)}
       onMouseLeave={() => setIsExpanded(false)}
     >
