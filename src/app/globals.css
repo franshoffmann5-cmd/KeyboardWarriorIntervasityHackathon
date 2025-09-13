@@ -167,7 +167,7 @@
 
   .font-pixel {
     font-family: var(--font-pixel);
-    font-size: 14px;
+    /* Removed fixed font-size to allow Tailwind classes to work */
     line-height: 1.4;
   }
 
@@ -186,33 +186,21 @@
     box-shadow: 0 0 10px var(--blueprint-cyan);
   }
 
-  /* Responsive utilities */
+  /* Responsive utilities - removed font-pixel overrides to allow Tailwind classes */
   @media (max-width: 640px) {
-    .font-pixel {
-      font-size: 12px;
-      line-height: 1.3;
-    }
+    /* Removed font-pixel font-size override */
   }
 
   @media (min-width: 768px) {
-    .font-pixel {
-      font-size: 16px;
-      line-height: 1.5;
-    }
+    /* Removed font-pixel font-size override */
   }
 
   @media (min-width: 1024px) {
-    .font-pixel {
-      font-size: 18px;
-      line-height: 1.5;
-    }
+    /* Removed font-pixel font-size override */
   }
 
   @media (min-width: 1280px) {
-    .font-pixel {
-      font-size: 20px;
-      line-height: 1.6;
-    }
+    /* Removed font-pixel font-size override */
   }
 
   /* Prevent horizontal scrolling on mobile */

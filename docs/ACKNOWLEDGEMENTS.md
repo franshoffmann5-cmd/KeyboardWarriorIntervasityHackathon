@@ -30,3 +30,8 @@ This document lists all **third-party repositories, modules, libraries, framewor
 | Name          | Source                              | Usage                             |
 |---------------|-------------------------------------|-----------------------------------|
 | MNIST         | http://yann.lecun.com/exdb/mnist/   | Training/testing machine learning |
+
+
+things that I used:
+piksel for pixel art
+imageMagick for pixel art

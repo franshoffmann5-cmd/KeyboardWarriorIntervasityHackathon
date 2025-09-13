@@ -8,6 +8,7 @@ interface LessonsPanelProps {
   isOpen: boolean
   onToggle: () => void
   onXpGain: (amount: number) => void
+  isSignedIn: boolean
 }
 
 const lessons = [
@@ -100,7 +101,7 @@ const lessons = [
   },
 ]
 
-export default function LessonsPanel({ isOpen, onToggle, onXpGain }: LessonsPanelProps) {
+export default function LessonsPanel({ isOpen, onToggle, onXpGain, isSignedIn }: LessonsPanelProps) {
   const [completedLessons, setCompletedLessons] = useState<number[]>([])
   const [currentLesson, setCurrentLesson] = useState<any>(null)
   const [showLessonModal, setShowLessonModal] = useState(false)
@@ -123,8 +124,12 @@ export default function LessonsPanel({ isOpen, onToggle, onXpGain }: LessonsPane
     <>
       {/* Toggle Tab */}
       <div
-        className={`fixed right-0 top-1/2 -translate-y-1/2 z-20 transition-transform duration-300 ${
-          isOpen ? "-translate-x-72 sm:-translate-x-96" : "translate-x-0"
+        className={`fixed right-0 top-1/2 -translate-y-1/2 z-20 transition-all duration-500 ease-out ${
+          !isSignedIn
+            ? "translate-x-full opacity-0 pointer-events-none"
+            : isOpen 
+              ? "-translate-x-72 sm:-translate-x-96" 
+              : "translate-x-0"
         }`}
       >
         <button
@@ -138,8 +143,12 @@ export default function LessonsPanel({ isOpen, onToggle, onXpGain }: LessonsPane
 
       {/* Panel */}
       <div
-        className={`fixed right-0 top-0 h-full w-72 sm:w-96 bg-blueprint-dark border-l-2 border-blueprint-cyan transform transition-transform duration-300 z-50 ${
-          isOpen ? "translate-x-0" : "translate-x-full"
+        className={`fixed right-0 top-0 h-full w-72 sm:w-96 bg-blueprint-dark border-l-2 border-blueprint-cyan transform transition-all duration-500 ease-out z-50 ${
+          !isSignedIn
+            ? "translate-x-full opacity-0 pointer-events-none"
+            : isOpen 
+              ? "translate-x-0" 
+              : "translate-x-full"
         }`}
       >
         <div className="p-3 sm:p-6 h-full overflow-y-auto">

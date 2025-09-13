@@ -50,7 +50,7 @@ export default function FortDisplay({ level }: FortDisplayProps) {
   return (
     <div className="text-center w-full max-w-lg mx-auto">
       {/* Fort Name */}
-      <h2 className="text-blueprint-cyan text-xl md:text-3xl lg:text-4xl xl:text-5xl font-pixel mb-4 sm:mb-6 lg:mb-8 tracking-wider px-2">
+      <h2 className="text-blueprint-cyan text-lg md:text-xl lg:text-2xl xl:text-3xl font-pixel mb-4 sm:mb-6 lg:mb-8 tracking-wider px-2">
         {getFortName(level)}
       </h2>
 

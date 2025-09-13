@@ -1,35 +1,49 @@
-> *This document serves as a template for you to write **setup** instructions for your project.* 
+# Password Fort - Setup Instructions
+This guide will help you set up and run the project on your local machine.
 
-> Depending on the scale/complexity of your project, it may prove beneficial to have a **Python/Batch/Bash** script in the `scripts/` directory which *automatically sets-up* the project.
+## Requirements
 
-# Setup Instructions
+Before you begin, ensure you have the following installed on your system:
 
-Follow the steps below to set up and run the project. (Example)
+- **Node.js** v18 or higher
+  - Download from: https://nodejs.org/
+  - Verify installation: `node --version`
+- **npm** (comes with Node.js)
+  - Verify installation: `npm --version`
+- **Git** (for cloning the repository)
+  - Download from: https://git-scm.com/
 
----
+## Installation
 
-## 📦 Requirements
-``` c
-// TODO: List software, runtimes, frameworks, and or dependencies
-// along with instructions on how to set each up.
-```
-- Example: Node.js v18+
-- Example: Python 3.10
-- Example: Docker
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/franshoffmann5-cmd/KeyboardWarriorIntervasityHackathon.git
+   cd KeyboardWarriorIntervasityHackathon
+   ```
 
----
+2. **Navigate to the source directory:**
+   ```bash
+   cd src
+   ```
 
-## ⚙️ Installation
-``` bash
-# Clone the repository
-git clone <your-repo-url>
-cd <repo-name>
+3. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-# Install dependencies
-<insert command here>
-```
+4. **Fix any security vulnerabilities (recommended):**
+   ```bash
+   npm audit fix --force
+   ```
 
-## ▶️ Running the Project
-``` bash
-<insert run command here> # Or an explanation on what to do
-```
+## Running the Project
+
+1. **Start the development server:**
+   ```bash
+   npm run dev
+   ```
+
+2. **Access the application:**
+   - Open your web browser (Chrome, Firefox, Edge, etc.)
+   - Navigate to: `http://localhost:3000` (the number may differ for you, but it should be something like this)
+   - The application will automatically reload when you make changes to the code

@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
+import { analyzePasswordStrength, getXpMultiplier } from "@/lib/password-strength"
 import PasswordAnalysisPopup from "./password-analysis-popup"
 import TwoFAPopup from "./two-fa-popup"
 import DuplicatePasswordPopup from "./duplicate-password-popup"
@@ -22,69 +23,15 @@ interface VaultPanelProps {
   entries: VaultEntry[]
   setEntries: (entries: VaultEntry[]) => void
   onXpGain: (amount: number) => void
+  isSignedIn: boolean
 }
 
-function analyzePassword(password: string) {
-  let score = 0
-  const suggestions = []
-
-  // Length check
-  if (password.length >= 12) {
-    score += 1
-  } else {
-    suggestions.push("Use at least 12 characters")
-  }
-
-  // Uppercase check
-  if (/[A-Z]/.test(password)) {
-    score += 1
-  } else {
-    suggestions.push("Include uppercase letters")
-  }
-
-  // Lowercase check
-  if (/[a-z]/.test(password)) {
-    score += 1
-  } else {
-    suggestions.push("Include lowercase letters")
-  }
-
-  // Numbers check
-  if (/\d/.test(password)) {
-    score += 1
-  } else {
-    suggestions.push("Include numbers")
-  }
-
-  // Special characters check
-  if (/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)) {
-    score += 1
-  } else {
-    suggestions.push("Include special characters (!@#$%^&*)")
-  }
-
-  // Common patterns check
-  if (!/(.)\1{2,}/.test(password) && !/123|abc|qwe|password|admin/i.test(password)) {
-    score += 1
-  } else {
-    suggestions.push("Avoid repeating characters or common patterns")
-  }
-
-  const strength = Math.min(score, 4)
-  const strengthLabels = ["Very Weak", "Weak", "Fair", "Good", "Excellent"]
-
-  return {
-    score: strength,
-    label: strengthLabels[strength],
-    suggestions: suggestions.slice(0, 3), // Limit to top 3 suggestions
-  }
-}
-
-export default function VaultPanel({ isOpen, onToggle, entries, setEntries, onXpGain }: VaultPanelProps) {
+export default function VaultPanel({ isOpen, onToggle, entries, setEntries, onXpGain, isSignedIn }: VaultPanelProps) {
   const [newSite, setNewSite] = useState("")
   const [newPassword, setNewPassword] = useState("")
   const [showAnalysis, setShowAnalysis] = useState(false)
   const [analysisResult, setAnalysisResult] = useState<any>(null)
+  const [xpInfo, setXpInfo] = useState<any>(null)
   const [show2FAPopup, setShow2FAPopup] = useState(false)
   const [current2FAEntry, setCurrent2FAEntry] = useState<VaultEntry | null>(null)
   const [is2FAActivation, setIs2FAActivation] = useState(true)
@@ -103,7 +50,7 @@ export default function VaultPanel({ isOpen, onToggle, entries, setEntries, onXp
       setDuplicateSites(duplicateSiteNames)
       
       // Create the pending entry for later use
-      const analysis = analyzePassword(newPassword)
+      const analysis = analyzePasswordStrength(newPassword)
       const newEntry: VaultEntry = {
         id: Date.now().toString(),
         siteName: newSite,
@@ -126,7 +73,7 @@ export default function VaultPanel({ isOpen, onToggle, entries, setEntries, onXp
   const proceedWithEntry = () => {
     if (!newSite.trim() || !newPassword.trim()) return
 
-    const analysis = analyzePassword(newPassword)
+    const analysis = analyzePasswordStrength(newPassword)
 
     const newEntry: VaultEntry = {
       id: Date.now().toString(),
@@ -139,9 +86,17 @@ export default function VaultPanel({ isOpen, onToggle, entries, setEntries, onXp
     const updatedEntries = [...entries, newEntry]
     setEntries(updatedEntries)
 
-    // Calculate XP gain based on actual password strength
-    const strengthXp = analysis.score * 10
+    // Calculate XP gain based on actual password strength with multiplier
+    const baseXp = 20; // Base XP for adding a password
+    const strengthXp = Math.round(baseXp * getXpMultiplier(analysis.score))
     onXpGain(strengthXp)
+
+    // Store XP info for display
+    setXpInfo({
+      baseXp: baseXp,
+      finalXp: strengthXp,
+      isDuplicate: false
+    })
 
     setAnalysisResult(analysis)
     setShowAnalysis(true)
@@ -155,9 +110,19 @@ export default function VaultPanel({ isOpen, onToggle, entries, setEntries, onXp
       const updatedEntries = [...entries, pendingEntry]
       setEntries(updatedEntries)
 
-      // Calculate XP gain, but reduce it due to security risk
-      const strengthXp = Math.max(1, analysisResult.score * 5) // Half XP for duplicate passwords
-      onXpGain(strengthXp)
+      // Calculate XP gain, but reduce it due to security risk of duplicate passwords
+      const baseXp = 20;
+      const fullXp = Math.round(baseXp * getXpMultiplier(analysisResult.score))
+      const reducedXp = Math.round(fullXp * 0.5) // Half XP for duplicates
+      const finalXp = Math.max(5, reducedXp) // Minimum 5 XP
+      onXpGain(finalXp)
+
+      // Store XP info for display
+      setXpInfo({
+        baseXp: baseXp,
+        finalXp: finalXp,
+        isDuplicate: true
+      })
 
       setAnalysisResult(analysisResult)
       setShowAnalysis(true)
@@ -213,8 +178,12 @@ export default function VaultPanel({ isOpen, onToggle, entries, setEntries, onXp
     <>
       {/* Toggle Tab */}
       <div
-        className={`fixed left-0 top-1/2 -translate-y-1/2 z-20 transition-transform duration-300 ${
-          isOpen ? "translate-x-64 sm:translate-x-80" : "translate-x-0"
+        className={`fixed left-0 top-1/2 -translate-y-1/2 z-20 transition-all duration-500 ease-out ${
+          !isSignedIn 
+            ? "-translate-x-full opacity-0 pointer-events-none" 
+            : isOpen 
+              ? "translate-x-64 sm:translate-x-80" 
+              : "translate-x-0"
         }`}
       >
         <button
@@ -228,8 +197,12 @@ export default function VaultPanel({ isOpen, onToggle, entries, setEntries, onXp
 
       {/* Panel */}
       <div
-        className={`fixed left-0 top-0 h-full w-64 sm:w-80 bg-blueprint-dark border-r-2 border-blueprint-cyan transform transition-transform duration-300 z-10 ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
+        className={`fixed left-0 top-0 h-full w-64 sm:w-80 bg-blueprint-dark border-r-2 border-blueprint-cyan transform transition-all duration-500 ease-out z-10 ${
+          !isSignedIn
+            ? "-translate-x-full opacity-0 pointer-events-none"
+            : isOpen 
+              ? "translate-x-0" 
+              : "-translate-x-full"
         }`}
       >
         <div className="p-3 sm:p-6 h-full overflow-y-auto">
@@ -280,7 +253,11 @@ export default function VaultPanel({ isOpen, onToggle, entries, setEntries, onXp
       </div>
 
       {showAnalysis && analysisResult && (
-        <PasswordAnalysisPopup analysis={analysisResult} onClose={() => setShowAnalysis(false)} />
+        <PasswordAnalysisPopup 
+          analysis={analysisResult} 
+          xpInfo={xpInfo}
+          onClose={() => setShowAnalysis(false)} 
+        />
       )}
 
       {show2FAPopup && current2FAEntry && (
