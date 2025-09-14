@@ -134,10 +134,13 @@ export default function LessonsPanel({ isOpen, onToggle, onXpGain, isSignedIn }:
       >
         <button
           onClick={onToggle}
-          className="bg-blueprint-dark border-2 border-blueprint-cyan border-r-0 px-3 sm:px-4 py-8 sm:py-12 text-blueprint-cyan font-pixel text-sm sm:text-base hover:bg-blueprint-cyan hover:text-blueprint transition-colors min-w-[60px] sm:min-w-[80px] flex items-center justify-center"
+          className="bg-blueprint-dark border-2 border-blueprint-cyan border-r-0 w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 xl:w-28 xl:h-28 text-blueprint-cyan font-pixel hover:bg-blueprint-dark/80 hover:border-white transition-all duration-300 hover:scale-105 flex items-center justify-center group"
         >
-          <span className="hidden sm:inline">LESSONS</span>
-          <span className="sm:hidden">L</span>
+          <img 
+            src="/Book.png" 
+            alt="Lessons" 
+            className="w-full h-full object-contain p-1 sm:p-2 filter brightness-90 group-hover:brightness-110 transition-all duration-300"
+          />
         </button>
       </div>
 

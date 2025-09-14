@@ -24,9 +24,10 @@ interface VaultPanelProps {
   setEntries: (entries: VaultEntry[]) => void
   onXpGain: (amount: number) => void
   isSignedIn: boolean
+  onAchievementCheck?: () => void
 }
 
-export default function VaultPanel({ isOpen, onToggle, entries, setEntries, onXpGain, isSignedIn }: VaultPanelProps) {
+export default function VaultPanel({ isOpen, onToggle, entries, setEntries, onXpGain, isSignedIn, onAchievementCheck }: VaultPanelProps) {
   const [newSite, setNewSite] = useState("")
   const [newPassword, setNewPassword] = useState("")
   const [showAnalysis, setShowAnalysis] = useState(false)
@@ -85,6 +86,14 @@ export default function VaultPanel({ isOpen, onToggle, entries, setEntries, onXp
 
     const updatedEntries = [...entries, newEntry]
     setEntries(updatedEntries)
+
+    // Check for achievement unlocks
+    if (onAchievementCheck) {
+      // Use setTimeout to ensure state updates before checking achievements
+      setTimeout(() => {
+        onAchievementCheck()
+      }, 100)
+    }
 
     // Calculate XP gain based on actual password strength with multiplier
     const baseXp = 20; // Base XP for adding a password
@@ -168,6 +177,13 @@ export default function VaultPanel({ isOpen, onToggle, entries, setEntries, onXp
         return entry
       })
       setEntries(updatedEntries)
+
+      // Check for achievement unlocks after 2FA changes
+      if (onAchievementCheck) {
+        setTimeout(() => {
+          onAchievementCheck()
+        }, 100)
+      }
     }
 
     setShow2FAPopup(false)
@@ -188,10 +204,13 @@ export default function VaultPanel({ isOpen, onToggle, entries, setEntries, onXp
       >
         <button
           onClick={onToggle}
-          className="bg-blueprint-dark border-2 border-blueprint-cyan border-l-0 px-3 sm:px-4 py-8 sm:py-12 text-blueprint-cyan font-pixel text-sm sm:text-base hover:bg-blueprint-cyan hover:text-blueprint transition-colors min-w-[60px] sm:min-w-[80px] flex items-center justify-center"
+          className="bg-blueprint-dark border-2 border-blueprint-cyan border-l-0 w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 xl:w-28 xl:h-28 text-blueprint-cyan font-pixel hover:bg-blueprint-dark/80 hover:border-white transition-all duration-300 hover:scale-105 flex items-center justify-center group"
         >
-          <span className="hidden sm:inline">VAULT</span>
-          <span className="sm:hidden">V</span>
+          <img 
+            src="/Lock.png" 
+            alt="Vault" 
+            className="w-full h-full object-contain p-1 sm:p-2 filter brightness-90 group-hover:brightness-110 transition-all duration-300"
+          />
         </button>
       </div>
 

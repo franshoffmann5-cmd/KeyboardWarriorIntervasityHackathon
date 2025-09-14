@@ -8,9 +8,19 @@ import LessonsPanel from "@/components/lessons-panel"
 import LevelUpOverlay from "@/components/level-up-overlay"
 import WelcomeModal from "@/components/welcome-modal"
 import SignInModal from "@/components/sign-in-modal"
+import LeaderboardModal from "@/components/leaderboard-modal"
+import AchievementsModal from "@/components/achievements-modal"
+import AchievementUnlockOverlay from "@/components/achievement-unlock-overlay"
 import VolumeControl from "@/components/VolumeControl"
 import FooterAcknowledgements from "@/components/FooterAcknowledgements"
 import { useSimpleAudio } from "@/audio/useSimpleAudio"
+import { 
+  Achievement, 
+  AchievementCheckData,
+  loadAchievementProgress,
+  saveAchievementProgress,
+  checkAchievements 
+} from "@/lib/achievements"
 
 // Chiptune playlist
 const PLAYLIST = [
@@ -41,11 +51,15 @@ export default function Fortify() {
   const [showSignIn, setShowSignIn] = useState(false)
   const [isSignedIn, setIsSignedIn] = useState(false)
   const [showMusicEnable, setShowMusicEnable] = useState(false)
+  const [showLeaderboard, setShowLeaderboard] = useState(false)
+  
+  // Achievement system
+  const [achievements, setAchievements] = useState<Achievement[]>([])
+  const [showAchievements, setShowAchievements] = useState(false)
+  const [showAchievementUnlock, setShowAchievementUnlock] = useState<Achievement | null>(null)
 
   // Audio manager
   const audio = useSimpleAudio(PLAYLIST);
-  
-  console.log('🎵 Page component - audio enabled:', audio.enabled, 'volume:', audio.volume, 'muted:', audio.muted);
 
   // Auto-start music when component mounts
   useEffect(() => {
@@ -55,21 +69,15 @@ export default function Fortify() {
       if (hasStarted) return; // Prevent multiple starts
       hasStarted = true;
       
-      console.log('🎵 startMusic called - audio enabled:', audio.enabled);
-      
       try {
-        console.log('🎵 Attempting auto-start music');
         await audio.start();
-        console.log('🎵 Auto-start music succeeded');
       } catch (error) {
-        console.log('🎵 Auto-start failed (likely due to autoplay policy):', error);
         // Show enable music button if autoplay fails
         setShowMusicEnable(true);
       }
     };
 
     // Try auto-start with delay
-    console.log('🎵 Setting up music start timer');
     const timer = setTimeout(startMusic, 500);
     
     return () => {
@@ -77,13 +85,27 @@ export default function Fortify() {
     };
   }, []);
 
+  // Load achievements on mount
+  useEffect(() => {
+    const loadedAchievements = loadAchievementProgress()
+    setAchievements(loadedAchievements)
+  }, [])
+
+  // Check achievements when vault entries change
+  useEffect(() => {
+    if (vaultEntries.length > 0 && achievements.length > 0) {
+      checkAndUpdateAchievements()
+    }
+  }, [vaultEntries.length, achievements.length]);
+
   // Level thresholds
-  const levelThresholds = [0, 150, 300, 500]
+  const levelThresholds = [0, 250, 500, 750, 1500]
 
   const getCurrentLevel = (currentXp: number) => {
-    if (currentXp >= 500) return 4
-    if (currentXp >= 300) return 3
-    if (currentXp >= 150) return 2
+    //if (currentXp >= 1500) return 5
+    if (currentXp >= 750) return 4
+    if (currentXp >= 500) return 3
+    if (currentXp >= 250) return 2
     return 1
   }
 
@@ -98,6 +120,33 @@ export default function Fortify() {
 
     setXp(newXp)
     setLevel(newLevel)
+  }
+
+  // Check achievements function
+  const checkAndUpdateAchievements = () => {
+    const checkData: AchievementCheckData = {
+      passwordCount: vaultEntries.length,
+      longestPassword: Math.max(0, ...vaultEntries.map(entry => entry.password.length)),
+      twoFAEnabled: vaultEntries.filter(entry => entry.has2FA).length
+    }
+
+    const unlocks = checkAchievements(achievements, checkData)
+    const newUnlocks = unlocks.filter(unlock => unlock.isNewUnlock)
+
+    if (newUnlocks.length > 0) {
+      // Update achievements state
+      const updatedAchievements = [...achievements]
+      setAchievements(updatedAchievements)
+      saveAchievementProgress(updatedAchievements)
+
+      // Show achievement unlock notifications one by one
+      newUnlocks.forEach((unlock, index) => {
+        setTimeout(() => {
+          addXp(unlock.achievement.xpReward)
+          setShowAchievementUnlock(unlock.achievement)
+        }, index * 500) // Stagger multiple achievement unlocks
+      })
+    }
   }
 
   return (
@@ -126,6 +175,7 @@ export default function Fortify() {
           setEntries={setVaultEntries}
           onXpGain={addXp}
           isSignedIn={isSignedIn}
+          onAchievementCheck={checkAndUpdateAchievements}
         />
 
         {/* Center Column */}
@@ -162,15 +212,52 @@ export default function Fortify() {
             <LevelBar
               xp={xp}
               level={level}
-              maxXp={level < 4 ? levelThresholds[level] : 1000}
+              maxXp={level < 5 ? levelThresholds[level] : 2000}
               minXp={level > 1 ? levelThresholds[level - 1] : 0}
               onClick={() => addXp(100)}
             />
           </div>
 
-          {/* Fort Display */}
+          {/* Fort Display with Side Buttons */}
           <div className="relative flex-1 flex items-center justify-center w-full">
-            <FortDisplay level={level} />
+            <div className="flex items-center justify-center w-full max-w-7xl">
+              {/* Left Star Button */}
+              <div className={`flex justify-end pr-12 sm:pr-16 lg:pr-24 xl:pr-32 flex-1 transition-all duration-300 ${
+                !isSignedIn ? "opacity-0 pointer-events-none" : "opacity-100"
+              }`}>
+                <button 
+                  onClick={() => setShowAchievements(true)}
+                  className="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 xl:w-28 xl:h-28 border-2 border-blueprint-cyan bg-blueprint-dark/50 hover:bg-blueprint-dark/80 transition-all duration-300 hover:scale-105 hover:border-white group"
+                >
+                  <img 
+                    src="/Star.png" 
+                    alt="Star" 
+                    className="w-full h-full object-contain p-1 sm:p-2 filter brightness-90 group-hover:brightness-110 transition-all duration-300"
+                  />
+                </button>
+              </div>
+
+              {/* Central Fort Display */}
+              <div className="flex-shrink-0">
+                <FortDisplay level={level} />
+              </div>
+
+              {/* Right Trophy Button */}
+              <div className={`flex justify-start pl-12 sm:pl-16 lg:pl-24 xl:pl-32 flex-1 transition-all duration-300 ${
+                !isSignedIn ? "opacity-0 pointer-events-none" : "opacity-100"
+              }`}>
+                <button 
+                  onClick={() => setShowLeaderboard(true)}
+                  className="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 xl:w-28 xl:h-28 border-2 border-blueprint-cyan bg-blueprint-dark/50 hover:bg-blueprint-dark/80 transition-all duration-300 hover:scale-105 hover:border-white group"
+                >
+                  <img 
+                    src="/Trophy.png" 
+                    alt="Trophy" 
+                    className="w-full h-full object-contain p-1 sm:p-2 filter brightness-90 group-hover:brightness-110 transition-all duration-300"
+                  />
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -202,11 +289,10 @@ export default function Fortify() {
             setShowWelcome(false);
             // Try to start music with user interaction
             try {
-              console.log('🎵 Starting music after user interaction');
               await audio.start();
               setShowMusicEnable(false); // Hide music enable button if it was shown
             } catch (error) {
-              console.log('🎵 Failed to start music on user interaction:', error);
+              // Music start failed
             }
           }} 
         />
@@ -223,6 +309,32 @@ export default function Fortify() {
         />
       )}
 
+      {/* Leaderboard Modal */}
+      {showLeaderboard && (
+        <LeaderboardModal
+          isOpen={showLeaderboard}
+          onClose={() => setShowLeaderboard(false)}
+          currentUserXp={xp}
+        />
+      )}
+
+      {/* Achievements Modal */}
+      {showAchievements && (
+        <AchievementsModal
+          isOpen={showAchievements}
+          onClose={() => setShowAchievements(false)}
+          achievements={achievements}
+        />
+      )}
+
+      {/* Achievement Unlock Overlay */}
+      {showAchievementUnlock && (
+        <AchievementUnlockOverlay
+          achievement={showAchievementUnlock}
+          onClose={() => setShowAchievementUnlock(null)}
+        />
+      )}
+
       {/* Enable Music Button (shows if autoplay failed) */}
       {showMusicEnable && (
         <button
@@ -231,12 +343,12 @@ export default function Fortify() {
               await audio.start();
               setShowMusicEnable(false);
             } catch (error) {
-              console.log('🎵 Manual music start failed:', error);
+              // Manual music start failed
             }
           }}
           className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-blueprint-cyan text-blueprint-dark px-4 py-2 font-pixel text-sm border-2 border-blueprint-cyan hover:bg-white transition-colors z-50"
         >
-          🎵 ENABLE MUSIC
+          ENABLE MUSIC
         </button>
       )}
     </div>

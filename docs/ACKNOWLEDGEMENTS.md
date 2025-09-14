@@ -13,25 +13,33 @@ This document lists all **third-party repositories, modules, libraries, framewor
 ## 📦 Libraries, Frameworks & Submodules
 | Name                 | Link / Repo                                           | Author(s)       | Usage                  |
 |----------------------|-------------------------------------------------------|-----------------|------------------------|
-| IntricatePointers    | https://github.com/DnA-IntRicate/IntricatePointers    | Adam Foflonker  | Memory management      |
-| fast_obj             | https://github.com/thisistherk/fast_obj               | Richard Knight  | Parsing OBJ files      |
+| Next.js              | https://nextjs.org/                                  | Vercel          | React framework and routing |
+| React                | https://reactjs.org/                                 | Meta            | UI component library   |
+| TypeScript           | https://www.typescriptlang.org/                      | Microsoft       | Type-safe development  |
+| Tailwind CSS         | https://tailwindcss.com/                             | Tailwind Labs   | Utility-first CSS framework |
+| Radix UI             | https://www.radix-ui.com/                            | Radix           | Accessible UI components |
+| Lucide React         | https://lucide.dev/                                  | Lucide          | Icon library           |
+| Clsx                 | https://github.com/lukeed/clsx                       | Luke Edwards    | Conditional CSS classes |
 
 ---
 
 ## 🌐 APIs & Services
 | Name          | Link / Docs                        | Author(s)      | Usage                             |
 |---------------|------------------------------------|----------------|-----------------------------------|
-| OpenWeather   | https://openweathermap.org/api     | Open Weather   | Fetching weather data             |
-| Stripe        | https://stripe.com/docs/api        | Stripe         | Payment handling                  |
+| HTML5 Audio API | https://developer.mozilla.org/en-US/docs/Web/API/HTMLAudioElement | W3C | Background music playback |
+| Web Storage API | https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API | W3C | Local data persistence |
 
 ---
 
-## 📊 Datasets
+## 📊 Assets & Media
 | Name          | Source                              | Usage                             |
 |---------------|-------------------------------------|-----------------------------------|
-| MNIST         | http://yann.lecun.com/exdb/mnist/   | Training/testing machine learning |
+| Pixverse Music | https://www.youtube.com/@Pixverses | Royalty-free chiptune background music |
+| Custom Pixel Art | Created with Piksel and ImageMagick | Fort progression graphics and UI icons |
 
+---
 
-things that I used:
-piksel for pixel art
-imageMagick for pixel art
+## 🎨 Tools Used for Asset Creation
+- **Piksel**: For creating pixel art graphics and animations
+- **ImageMagick**: For image processing and optimization of pixel art assets
+- **Custom Development**: All gameplay mechanics, password analysis algorithms, and progression systems built from scratch
